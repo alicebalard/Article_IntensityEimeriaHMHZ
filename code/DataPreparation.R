@@ -10,7 +10,7 @@ list.of.packages <- c("parasiteLoad",
                       "fitdistrplus", # evaluate distribution
                       "epiR", # Sterne's exact method
                       "simpleboot", # BS
-                      # "boot", # BS
+                      "plyr", # revalue and other
                       "ggmap",
                       "gridExtra",# several plots in one panel
                       "wesanderson", # nice colors
@@ -148,9 +148,15 @@ cleanData$UsedForPinwormsRes <- "no"
 cleanData$UsedForEimeriaImpactHealth <- "no"
 cleanData$UsedForPinwormsImpactHealth <- "no"
 
-##### map
+##### Geneland map
 
-# TBC
+diploidMarkers <- c("Es1C", "Gpd1C", "Idh1C", "MpiC", "NpC", "Sod1C")
+
+# use for map all individuals with 6 diploid markers
+
+cleanData$UsedForMap <- rowSums(is.na(cleanData[diploidMarkers]))
+cleanData$UsedForMap[cleanData$UsedForMap %in% 0] <- "yes"
+cleanData$UsedForMap[cleanData$UsedForMap != "yes"] <- "no"
 
 ##### Eimeria qpcr ##### 
 qpcrdata <- BALdata[!is.na(BALdata$delta_ct_cewe_MminusE) | !is.na(BALdata$delta_ct_ilwe_MminusE),]

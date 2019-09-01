@@ -24,9 +24,8 @@ makeHistWorm <- function(i){
 }
 
 plot_grid(makeHistWorm(1), makeHistWorm(2), makeHistWorm(3),
-          makeHistWorm(4),makeHistWorm(5),makeHistWorm(6),
-          labels=c("A", "B", "C", "D", "E", "F"), label_size = 15,
-          ncol = 2)
+          makeHistWorm(4), makeHistWorm(5), makeHistWorm(6),
+          labels=c("A", "B", "C", "D", "E", "F"), label_size=15, ncol=2)
 
 #### CHECK WITH JENNY --> are Nas Nas or zeros???
-       
+         
