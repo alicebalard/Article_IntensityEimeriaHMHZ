@@ -34,6 +34,34 @@ if(!"legendMap" %in% installed.packages()[,"Package"]){
 }
 library(legendMap)
 
+# Define function to be used to test, get the log lik and aic
+tryDistrib <- function(x, distrib){
+  # deals with fitdistr error:
+  fit <- tryCatch(MASS::fitdistr(x, distrib), error=function(err) "fit failed")
+  return(list(fit = fit,
+              loglik = tryCatch(fit$loglik, error=function(err) "no loglik computed"), 
+              AIC = tryCatch(fit$aic, error=function(err) "no aic computed")))
+}
+
+findGoodDist <- function(x, distribs, distribs2){
+  l =lapply(distribs, function(i) tryDistrib(x, i))
+  names(l) <- distribs
+  print(l)
+  listDistr <- lapply(distribs2, function(i){
+    if (i %in% "t"){
+      fitdistrplus::fitdist(x, i, start = list(df =2))
+    } else {
+      fitdistrplus::fitdist(x,i)
+    }}
+  ) 
+  par(mfrow=c(2,2))
+  denscomp(listDistr, legendtext=distribs2)
+  cdfcomp(listDistr, legendtext=distribs2)
+  qqcomp(listDistr, legendtext=distribs2)
+  ppcomp(listDistr, legendtext=distribs2)
+  par(mfrow=c(1,1))
+}
+
 ## Define functions used for data analysis
 area <- get_map(location = c(12, 51.5, 15, 53.5),
                 source = "stamen", maptype = "toner-lite")
@@ -91,7 +119,9 @@ pinwormsdata_watwm$presence_oxyurids <- 1
 pinwormsdata_watwm$presence_oxyurids[pinwormsdata_watwm$Aspiculuris.Syphacia == 0] <- 0
 
 BALdata <- BALdata[!is.na(BALdata$HI) & !is.na(BALdata$Sex),]
+BALdata$Status[BALdata$Status %in% "BA"] <- NA # error
 BALdata$Status[is.na(BALdata$Status)] <- "adult" # NAs in the field data status were adults
+BALdata$Status <- droplevels(BALdata$Status)
 
 getinfotab <- function(df){
   return(list(Nmice = nrow(df),
@@ -178,8 +208,13 @@ getinfotab(qpcrdata)
 
 cleanData$UsedForEimeriaRes[cleanData$Mouse_ID %in% qpcrdata$Mouse_ID] <- "yes"
 
-##### pinworms ##### 
+##### All mice that were investigated for pinworms were also investigated for other helminths ##### 
 pinwormsdata_bal <- cleanData[!is.na(cleanData$Aspiculuris_Syphacia),]
+idToCorrect <- pinwormsdata_bal[rowSums(is.na(pinwormsdata_bal[,listWorms])) > 0, "Mouse_ID"]
+cleanData[cleanData$Mouse_ID %in% idToCorrect, listWorms][
+  is.na(cleanData[cleanData$Mouse_ID %in% idToCorrect, listWorms])] <- 0
+pinwormsdata_bal <- cleanData[!is.na(cleanData$Aspiculuris_Syphacia),]
+
 pinwormsdata_bal$`Aspiculuris.Syphacia+1` <-
   pinwormsdata_bal$Aspiculuris_Syphacia + 1
 pinwormsdata_bal$presence_oxyurids <- 1
@@ -231,3 +266,4 @@ cleanData$UsedForPinwormsImpactHealth[cleanData$Mouse_ID %in% body_data_pinworms
 cleanData$farm <- as.numeric(factor(cleanData$farm))
 
 write.csv(cleanData, "../data/cleanedData.csv", row.names = F)
+
