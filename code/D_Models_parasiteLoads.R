@@ -57,8 +57,8 @@ plotInfWorms <- plotInfWorms +
 
 # qPCR Eimeria
 
-# intensity : delta_ct_max_MminusE+5 to have it positive
-qpcr_intensity_data <- qpcrdata[qpcrdata$`delta_ct_max_MminusE+5` > 0,]
+# intensity : delta_ct_max_MminusE+5 to have it positive (in DataPReparation)
+# qpcr_intensity_data <- qpcrdata[qpcrdata$`delta_ct_max_MminusE+5` > 0,]
 
 # start with 6, and find out which value of shift maximize the likelihood
 fit_qpcr_intensity_findShift <- parasiteLoad::analyse(
@@ -115,60 +115,3 @@ plotInfEimeria <- parasiteLoad::bananaPlot(
       paste("Eimeria intensity (", Delta, "Ct Mouse - Eimeria)")))
 plotInfEimeria
     
-### After reveiw JEB
-## Separate Eimeria species (Supplementary material)
-
-## --> E.ferrisi found in cecum
-sub_qpcr_intensity_data <- qpcr_intensity_data[
-  qpcr_intensity_data$eimeriaSpecies %in% c("E_ferrisi", "Double"),]
-
-nrow(sub_qpcr_intensity_data)
-
-# again, start with 6, and find out which value of shift maximize the likelihood
-fit_sub_qpcr_intensity_findShift <- parasiteLoad::analyse(
-  data = sub_qpcr_intensity_data,
-  response = "delta_ct_max_MminusE+6",
-  model = "weibullshifted",
-  group = "Sex")
-
-# Get the shift optimal for H0
-shift2 <- coef(fit_sub_qpcr_intensity_findShift$H0)["SHIFT"]
-
-# Now run while adding this 0.93 value
-sub_qpcr_intensity_data$shiftedDeltaCt <-
-  sub_qpcr_intensity_data$`delta_ct_max_MminusE+6` + shift2
-
-fit_suqpcr_intensity <- parasiteLoad::analyse(
-  data = sub_qpcr_intensity_data,
-  response = "shiftedDeltaCt",
-  model = "weibull",
-  group = "Sex")
-
-fit_suqpcr_intensity
-coef(fit_suqpcr_intensity$H0)
-# L1     alpha   myshape 
-# 6.5429342 0.7900411 2.5840015 
-
-# Get actual values of L1 and L2 for raw deltaCt
-getUnshiftedData(coef(fit_suqpcr_intensity$H0))
-getUnshiftedData(coef(fit_suqpcr_intensity$H1))
-getUnshiftedData(coef(fit_suqpcr_intensity$H2$groupA))
-getUnshiftedData(coef(fit_suqpcr_intensity$H2$groupB))
-getUnshiftedData(coef(fit_suqpcr_intensity$H3$groupA))
-getUnshiftedData(coef(fit_suqpcr_intensity$H3$groupB))
-
-plotInfEimeria_sub <- parasiteLoad::bananaPlot(
-  mod = fit_suqpcr_intensity$H0,
-  data = sub_qpcr_intensity_data,
-  response = "shiftedDeltaCt",
-  islog10 = FALSE, group = "Sex",
-  cols = c("darkgreen", "darkgreen")) +
-  theme_bw() +
-  theme(axis.title.x=element_blank(),
-        legend.position = "none") +
-  scale_y_continuous(
-    breaks = c(2:12 + 0.14), # to remove the shift
-    labels = as.character(round(c(2:12 + shift) - (6 + shift))),
-    expression(
-      paste("Eimeria ferrisi intensity (", Delta, "Ct Mouse - Eimeria)")))
-plotInfEimeria_sub 

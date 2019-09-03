@@ -127,7 +127,80 @@ dev.off()
 
 ##### Supp. material C ##### 
 ### See "Models_parasiteLoads.R"
+### After reveiw JEB
+## Separate Eimeria species (Supplementary material)
 
+## --> E.ferrisi found in cecum
+sub_qpcr_intensity_data <- qpcr_intensity_data[
+  grep("ferrisi", qpcr_intensity_data$eimeriaSpecies),]
+
+table(qpcrdata$presence_eferrisi_identified, qpcrdata$presence_eimeria_tissues)
+nrow(sub_qpcr_intensity_data) # only 44 out of 70 identified at the species level
+
+# again, start with 6, and find out which value of shift maximize the likelihood
+fit_sub_qpcr_intensity_findShift <- parasiteLoad::analyse(
+  data = sub_qpcr_intensity_data,
+  response = "delta_ct_max_MminusE+6",
+  model = "weibullshifted",
+  group = "Sex")
+
+# Get the shift optimal for H0
+shift2 <- coef(fit_sub_qpcr_intensity_findShift$H0)["SHIFT"]
+
+# Now run while adding this 0.93 value
+sub_qpcr_intensity_data$shiftedDeltaCt <-
+  sub_qpcr_intensity_data$`delta_ct_max_MminusE+6` + shift2
+
+fit_suqpcr_intensity <- parasiteLoad::analyse(
+  data = sub_qpcr_intensity_data,
+  response = "shiftedDeltaCt",
+  model = "weibull",
+  group = "Sex")
+
+fit_suqpcr_intensity
+coef(fit_suqpcr_intensity$H0)
+# L1     alpha   myshape 
+# 6.5429342 0.7900411 2.5840015 
+
+# Get actual values of L1 and L2 for raw deltaCt
+getUnshiftedData2 <- function(vector){
+  vector[c("L1", "L2")] <- vector[c("L1", "L2")] - 6 - shift2
+  return(vector)
+}
+getUnshiftedData2(coef(fit_suqpcr_intensity$H0))
+getUnshiftedData2(coef(fit_suqpcr_intensity$H1))
+getUnshiftedData2(coef(fit_suqpcr_intensity$H2$groupA))
+getUnshiftedData2(coef(fit_suqpcr_intensity$H2$groupB))
+getUnshiftedData2(coef(fit_suqpcr_intensity$H3$groupA))
+getUnshiftedData2(coef(fit_suqpcr_intensity$H3$groupB))
+
+plotInfEimeria_sub <- parasiteLoad::bananaPlot(
+  mod = fit_suqpcr_intensity$H0,
+  data = sub_qpcr_intensity_data,
+  response = "shiftedDeltaCt",
+  islog10 = FALSE, group = "Sex",
+  cols = c("white", "white")) +
+  theme_bw() +
+  theme(axis.title.x=element_blank(),
+        legend.position = "none") +
+  scale_y_continuous(
+    breaks = c(2:12 + 0.14), # to remove the shift
+    labels = as.character(round(c(2:12 + shift2) - (6 + shift2))),
+    expression(
+      paste("Eimeria ferrisi intensity (", Delta, "Ct Mouse - Eimeria)")))
+plotInfEimeria_sub 
+
+## prevalence with only Eimeria ferrisi identified
+
+## Apply on our datasets
+C <- prevFun(qpcrdata, "presence_eferrisi_identified")
+prevalenceAlongHIEimeriaFerrisi <- C$plot + ylab("Predicted probability of infection") + 
+   theme(legend.position = "none")
+C$output # no signif of HI, sex, or both
+
+# pdf("../figures/supplementaryC.pdf", width = 12, height = 5)
+plot_grid(prevalenceAlongHIEimeriaFerrisi, plotInfEimeria_sub, labels = c("a", "b"))
+# dev.off() 
 ##### Supp. material D ##### 
 
 ## histograms of all detected nematodes (after removing BALdata embrios)
@@ -164,7 +237,6 @@ length(x)
 findGoodDist(x, distribs = c("normal", "t", "weibull"), 
              distribs2 = c("norm", "t", "weibull")) # Normal performs well
 
-
 fitMortality <- parasiteLoad::analyse(
   data = body_data_pinworms,
   response = "Body_weight",
@@ -184,4 +256,10 @@ P2 <- plotMortality +
   xlab("HI (hybrid index)") +
   ylab("Body weight (g) as approximation of age")
 
- 
+##### Supp. material G ##### 
+## See prevalenceAlongHI.R
+
+##### Supp. material H ##### 
+
+# Eimeria+pinworms vs Eimeria without pinworms
+table(qpcr_intensity_data$Aspiculuris_Syphacia > 0)

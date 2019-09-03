@@ -189,7 +189,7 @@ cleanData$UsedForMap[cleanData$UsedForMap %in% 0] <- "yes"
 cleanData$UsedForMap[cleanData$UsedForMap != "yes"] <- "no"
 
 ##### Eimeria qpcr ##### 
-qpcrdata <- BALdata[!is.na(BALdata$delta_ct_cewe_MminusE) | !is.na(BALdata$delta_ct_ilwe_MminusE),]
+qpcrdata <- cleanData[!is.na(cleanData$delta_ct_cewe_MminusE) | !is.na(cleanData$delta_ct_ilwe_MminusE),]
 df <- qpcrdata[, c("delta_ct_cewe_MminusE", "delta_ct_ilwe_MminusE")]
 qpcrdata$delta_ct_max_MminusE <- apply(df, 1, function(x){max(x, na.rm = T)})
 rm(df)
@@ -203,8 +203,16 @@ qpcrdata$`delta_ct_max_MminusE+6` <- qpcrdata$delta_ct_max_MminusE + 6
 qpcrdata$presence_eimeria_tissues <- 1
 qpcrdata$presence_eimeria_tissues[qpcrdata$delta_ct_max_MminusE == -5] <- 0
 qpcrdata$presence_eimeria_tissues <- as.factor(qpcrdata$presence_eimeria_tissues)
+table(qpcrdata$presence_eimeria_tissues)
+
+qpcrdata$presence_eferrisi_identified <- 0
+qpcrdata$presence_eferrisi_identified[grep("ferrisi", qpcrdata$eimeriaSpecies)] <- 1
+table(qpcrdata$presence_eferrisi_identified)
 
 getinfotab(qpcrdata)
+
+# for model intensity
+qpcr_intensity_data <- qpcrdata[qpcrdata$`delta_ct_max_MminusE+5` > 0,]
 
 cleanData$UsedForEimeriaRes[cleanData$Mouse_ID %in% qpcrdata$Mouse_ID] <- "yes"
 
