@@ -77,3 +77,4 @@ Geneland::PlotTessellation(coordinates = coord,
                                      path.mcmc="../data/outputGeneland/",
                                      colfancy =  colorRampPalette(c("blue", "red"))(100), 
                                      plotCities = T, path = "./figures/")
+    

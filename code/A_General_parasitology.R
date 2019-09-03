@@ -1,6 +1,9 @@
 source("DataPreparation.R")
 
 # A. General parasitology
+getinfotab(cleanData)
+
+
 myQuantitativeParasitology(pinwormsdata_watwm$Aspiculuris.Syphacia)
 
 myQuantitativeParasitology(pinwormsdata_bal$Aspiculuris_Syphacia)

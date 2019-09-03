@@ -120,10 +120,10 @@ FigSup2
 
 supplementaryB <- plot_grid(FigSup1, FigSup2, ncol = 1)
 
-pdf(file = "../figures/supplementaryB.pdf",
-    width = 10, height = 10)
+# pdf(file = "../figures/supplementaryB.pdf",
+#     width = 10, height = 10)
 supplementaryB
-dev.off()
+# dev.off()
 
 ##### Supp. material C ##### 
 ### See "Models_parasiteLoads.R"
