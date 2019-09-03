@@ -213,7 +213,7 @@ makeHistWorm <- function(i){
   xpos <- max(pinwormsdata_bal[listWorms[i]], na.rm = T)/2
   p <- ggplot(pinwormsdata_bal, aes_string(x = listWorms[i])) + 
     geom_histogram(col = "black") + theme_bw() + 
-    geom_text(aes(x=xpos,y=30,label=paste0(Ns, " positive, (N = ", Ntot, ")")),vjust=0) +
+    annotate("text", x = xpos, y= 30, label = paste0(Ns, " positive (N = ", Ntot, ")")) +
     scale_y_log10()
   return(p)
 }

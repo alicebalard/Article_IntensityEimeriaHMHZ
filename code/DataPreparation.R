@@ -108,7 +108,7 @@ myQuantitativeParasitology <- function(x){
 # Load datasets from parasiteLoad
 WATWMdata <- read.csv("https://raw.githubusercontent.com/alicebalard/parasiteLoad/master/data/WATWMdata.csv", na.strings = c("", " ", NA))
 BALdata <- read.csv("https://raw.githubusercontent.com/alicebalard/parasiteLoad/master/data/BALdata.csv", na.strings = c("", " ", NA))
-                    
+
 # Keep individuals with hybrid index and sex
 WATWMdata <- WATWMdata[!is.na(WATWMdata$HI) & !is.na(WATWMdata$Sex),]
 # pinworms "where are the wormy mice"
@@ -139,15 +139,13 @@ getinfotab <- function(df){
 nrow(WATWMdata)
 table(WATWMdata$Sex)
 
-getinfotab(BALdata)
-
 ## HERE PREPARE THE CLEAN TABLE THAT IS USED FOR EACH ANALYSIS OF THIS ARTICLE (sup table S1)
 markersHI <- c("mtBamH", "YNPAR", "X332", "X347", "X65", "Tsx", "Btk", "Syap1", "Es1C", "Gpd1C", "Idh1C", "MpiC", "NpC", "Sod1C")
 listWorms <- c("Aspiculuris_Syphacia", "Hymenolepis", "Taenia", "Trichuris", "Heterakis", "Mastophorus")
 cleanData <- BALdata[c("Mouse_ID", "Sex", "Longitude", "Latitude", "Year", "farm", "Status",
-  markersHI, "HI_NLoci", "HI", listWorms, 
-  "Body_weight", "Body_length", "Tail_length", "Capture",
-  "delta_ct_ilwe_MminusE", "delta_ct_cewe_MminusE", "eimeriaSpecies")] 
+                       markersHI, "HI_NLoci", "HI", listWorms, 
+                       "Body_weight", "Body_length", "Tail_length", "Capture",
+                       "delta_ct_ilwe_MminusE", "delta_ct_cewe_MminusE", "eimeriaSpecies")] 
 
 cleanData$eimeriaSpecies <- as.character(cleanData$eimeriaSpecies)
 cleanData$eimeriaSpecies[cleanData$eimeriaSpecies %in% c("Other", "Negative")] <- "no sp. identified"
