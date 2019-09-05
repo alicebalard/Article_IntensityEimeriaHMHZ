@@ -255,6 +255,7 @@ P2 <- plotMortality +
   theme(legend.position = "none") +
   xlab("HI (hybrid index)") +
   ylab("Body weight (g) as approximation of age")
+P2
 
 ##### Supp. material G ##### 
 ## See prevalenceAlongHI.R
@@ -263,3 +264,4 @@ P2 <- plotMortality +
 
 # Eimeria+pinworms vs Eimeria without pinworms
 table(qpcr_intensity_data$Aspiculuris_Syphacia > 0)
+
