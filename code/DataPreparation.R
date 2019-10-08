@@ -25,7 +25,7 @@ ipak <- function(pkg){
 ipak(list.of.packages)
 
 ## Reinstall the package in case I updated it
-devtools::install_github("alicebalard/parasiteLoad")
+devtools::install_github("alicebalard/parasiteLoad@v2.0")
 library(parasiteLoad)
 
 ## Install_github case
