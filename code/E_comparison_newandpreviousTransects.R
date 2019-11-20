@@ -105,7 +105,8 @@ Gtest <- function(fitA, fitB){
   dLL <- LL1 - LL2
   dDF <- 1 # alpha fixed in one case
   pvalue <- 1 - pchisq(2*dLL, df=dDF)
-  data.frame(dLL = round(dLL, 2), dDF = dDF, pvalue = pvalue)
+  chisqvalue <- qchisq(p = pvalue, df = dDF)
+  data.frame(dLL = round(dLL, 2), dDF = dDF, pvalue = pvalue, chisqvalue = chisqvalue)
 }
 
 Gtest(fit_alphavaries, fit_noalpha)

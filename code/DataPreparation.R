@@ -25,7 +25,8 @@ ipak <- function(pkg){
 ipak(list.of.packages)
 
 ## Reinstall the package in case I updated it
-devtools::install_github("alicebalard/parasiteLoad@v2.0")
+# devtools::install_github("alicebalard/parasiteLoad@v2.0")
+devtools::install_github("alicebalard/parasiteLoad") # version with full Gtest Chisquare
 library(parasiteLoad)
 
 ## Install_github case
