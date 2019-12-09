@@ -3,7 +3,7 @@ source("DataPreparation.R")
 #### Investigate coinfection pinworms-Eimeria
 
 # qpcrdata contains mice that have been investigated for both worms and eimeria
-coinfDf <- qpcrdata[!is.na(rowSums(qpcrdata[c(l istWorms)])),] # N = 383
+coinfDf <- qpcrdata[!is.na(rowSums(qpcrdata[c(listWorms)])),] # N = 383
 coinfDf$presence_pinworms <- as.numeric(coinfDf$Aspiculuris_Syphacia > 0)
 coinfDf$presence_eimeria_tissues <- as.numeric(as.character(coinfDf$presence_eimeria_tissues))
 
@@ -12,15 +12,13 @@ table(pinworms = coinfDf$presence_pinworms)
 table(Eimeria = coinfDf$presence_eimeria_tissues)
 70/(70+313) # 18%
 
-table(Eimeria = coinfDf$presence_eimeria_tissues, pinworms = coinfDf$presence_pinworms)
-
+tabCoinf = table(Eimeria = coinfDf$presence_eimeria_tissues, pinworms = coinfDf$presence_pinworms)
+tabCoinf
 sum(table(Eimeria = coinfDf$presence_eimeria_tissues, pinworms = coinfDf$presence_pinworms))
 
 chisq.test(coinfDf$presence_eimeria_tissues, coinfDf$presence_pinworms)
 
 summary(lm(presence_eimeria_tissues ~ presence_pinworms, data = coinfDf))
-
-
 
 ###### Other stats, fail cause low power ###### 
 ## Analysis 1. Richness along HI
